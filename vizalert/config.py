@@ -45,6 +45,8 @@ required_conf_keys = \
     'threads',
     'trusted.clientip',
     'trusted.useclientip',
+    'trusted.retrycount',
+    'trusted.sleepduration',
     'vizalerts.source.viz',
     'vizalerts.source.site']
 
