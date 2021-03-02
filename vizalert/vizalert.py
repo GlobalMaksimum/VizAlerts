@@ -534,7 +534,7 @@ class VizAlert(object):
             Requests for the data itself should use the trigger_data list member to avoid multiple reads """
         try:
             f = open(self.trigger_data_file, 'r', encoding="utf-8")
-            return csv.DictReader(f)
+            return csv.DictReader(f,delimiter=";")
 
         except Exception as e:
             log.logger.error('Error accessing {} while getting processing alert {}: {}'.format(
