@@ -18,7 +18,7 @@ jobs:
       - name: InstallLib
         run: pip install pyyaml requests requests_ntlm pypdf2 twilio phonenumberslite
       - name: Build
-        run: build.bat
+        run: . ./build.bat
       - name: Release
         uses: softprops/action-gh-release@v1
         with: 
