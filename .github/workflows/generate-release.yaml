@@ -16,7 +16,7 @@ jobs:
           python-version: '3.7.7' # Version range or exact version of a Python version to use, using SemVer's version range syntax
           architecture: 'x64'
       - name: InstallLib
-        run: pip install pyyaml requests requests_ntlm pypdf2 twilio phonenumberslite
+        run: pip install pyinstaller pyyaml requests requests_ntlm pypdf2 twilio phonenumberslite
       - name: Build
         run: . ./build.bat
       - name: Release
