@@ -189,7 +189,7 @@ def export_view(view_url_suffix, site_name, timeout_s, data_retrieval_tries, for
     while attempts < data_retrieval_tries:
         try:
             attempts += 1
-
+            log.logger.debug('Currently in data retrieval trial #{}'.format(attempts))
             # get a trusted ticket
             ticket = get_trusted_ticket(server, site_name, user_sysname, encrypt, certcheck, certfile, user_domain, clientip, retrycount, sleepduration)
 			
