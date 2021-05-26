@@ -1,0 +1,27 @@
+name: Main
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.7.7' # Version range or exact version of a Python version to use, using SemVer's version range syntax
+          architecture: 'x64'
+      - name: InstallLib
+        run: pip install pyinstaller pyyaml requests requests_ntlm pypdf2 twilio phonenumberslite
+      - name: Build
+        run: . ./build.bat
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with: 
+          files: dist/vizalerts.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

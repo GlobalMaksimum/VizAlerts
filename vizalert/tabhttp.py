@@ -27,7 +27,7 @@ class Format(object):
 
 
 # Generate a trusted ticket
-def get_trusted_ticket(server, sitename, username, encrypt, certcheck=True, certfile=None, userdomain=None, clientip=None, tries=1):
+def get_trusted_ticket(server, sitename, username, encrypt, certcheck=True, certfile=None, userdomain=None, clientip=None, tries=1, sleepDuration=5):
     
     protocol = 'http'
     attempts = 0
@@ -88,6 +88,9 @@ def get_trusted_ticket(server, sitename, username, encrypt, certcheck=True, cert
             if ticket == '-1' or not ticket:
                 errormessage = 'Error generating trusted ticket. Value of ticket is {}.  Please see http://onlinehelp.tableau.com/current/server/en-us/trusted_auth_trouble_1return.htm Request details:'.format(ticket, requestdetails)
                 log.logger.error(errormessage)
+                errormessage = 'Sleeping for {} seconds...'.format(sleepDuration)
+                log.logger.error(errormessage)
+                time.sleep(sleepDuration)
                 raise UserWarning(errormessage)
 
         except urllib.error.HTTPError as e:
@@ -136,6 +139,8 @@ def export_view(view_url_suffix, site_name, timeout_s, data_retrieval_tries, for
     encrypt = config.configs['server.ssl']
     certcheck = config.configs['server.certcheck']
     certfile = config.configs['server.certfile']
+    sleepduration = config.configs['trusted.sleepduration']
+    retrycount = config.configs['trusted.retrycount']
     tempdir = config.configs['temp.dir']
     if config.configs['trusted.useclientip']:
         clientip = config.configs['trusted.clientip']
@@ -184,9 +189,9 @@ def export_view(view_url_suffix, site_name, timeout_s, data_retrieval_tries, for
     while attempts < data_retrieval_tries:
         try:
             attempts += 1
-
+            log.logger.debug('Currently in data retrieval trial #{}'.format(attempts))
             # get a trusted ticket
-            ticket = get_trusted_ticket(server, site_name, user_sysname, encrypt, certcheck, certfile, user_domain, clientip)
+            ticket = get_trusted_ticket(server, site_name, user_sysname, encrypt, certcheck, certfile, user_domain, clientip, retrycount, sleepduration)
 			
             # build final URL
             url = protocol + '://' + server + '/trusted/' + ticket + sitepart + '/views/' + viewurlsuffix + extraurlparameter + formatparam
