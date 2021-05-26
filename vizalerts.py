@@ -219,20 +219,33 @@ def get_alerts():
     source_viz.force_refresh = True
     source_viz.data_retrieval_tries = 3
 
+    retry_count=config.configs['trusted.retrycount']
+    
     log.logger.debug('Pulling source viz data down')
+    
+    attempts = 0
 
-    try:
-        source_viz.download_trigger_data()
-        if len(source_viz.error_list) > 0:
-            raise UserWarning(''.join(source_viz.error_list))
-        results = source_viz.read_trigger_data()
-        if len(source_viz.error_list) > 0:
-            raise UserWarning(''.join(source_viz.error_list))
+    while attempts < retry_count:
+        try:
+            source_viz.download_trigger_data()
+            if len(source_viz.error_list) > 0:
+                raise UserWarning(''.join(source_viz.error_list))
+            results = source_viz.read_trigger_data()
+            if len(source_viz.error_list) > 0:
+                raise UserWarning(''.join(source_viz.error_list))
 
-    except Exception as e:
-        quit_script('Could not process source viz data from {} for the following reasons:<br/><br/>{}'.format(
-			config.configs['vizalerts.source.viz'],
-            e.args[0]))
+        except Exception as e:
+            errormessage = 'Could not process source viz data from {} for the following reasons:<br/><br/>{}'.format(
+                    config.configs['vizalerts.source.viz'],
+                    e.args[0])
+            log.logger.error(errormessage)
+            if attempts >= retry_count:
+                log.logger.error('Attempt count exceeded the retry count of {}. Quitting...'.format(retry_count))
+                quit_script('Could not process source viz data from {} for the following reasons:<br/><br/>{}'.format(
+                    config.configs['vizalerts.source.viz'],
+                    e.args[0]))
+            else:
+                log.logger.error('Retrying downloading trigger data #{} out of {}'.format(attempts,retry_count))
 
     # test for regex invalidity
     try:
